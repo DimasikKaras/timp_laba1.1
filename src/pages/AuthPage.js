@@ -200,7 +200,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
             className="link-button"
             onClick={() => {
               setMode('login');
-              navigate('/Authentication');
+              navigate('/authentication');
             }}
           >
             Войти

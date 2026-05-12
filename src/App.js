@@ -114,7 +114,8 @@ const DashboardLayout = ({
               />
             }
           />
-          <Route path="/Authentication" element={<Navigate to="/objects" replace />} />
+          <Route path="/authentication" element={<Navigate to="/objects" replace />} />
+          <Route path="/Authentication" element={<Navigate to="/authentication" replace />} />
           <Route path="/register" element={<Navigate to="/objects" replace />} />
           <Route path="*" element={<Navigate to="/objects" replace />} />
         </Routes>
@@ -195,14 +196,15 @@ const App = () => {
       ) : (
         <Routes>
           <Route
-            path="/Authentication"
+            path="/authentication"
             element={<AuthPage onAuthenticated={setCurrentUser} initialMode="login" />}
           />
+          <Route path="/Authentication" element={<Navigate to="/authentication" replace />} />
           <Route
             path="/register"
             element={<AuthPage onAuthenticated={setCurrentUser} initialMode="register" />}
           />
-          <Route path="*" element={<Navigate to="/Authentication" replace />} />
+          <Route path="*" element={<Navigate to="/authentication" replace />} />
         </Routes>
       )}
     </BrowserRouter>
