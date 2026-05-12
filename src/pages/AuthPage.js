@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import { fioPattern, validateFIO } from '../utils/validation';
+import { fioPattern, passwordPattern, validateFIO, validatePassword } from '../utils/validation';
 
 const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
   const [mode, setMode] = useState(initialMode);
@@ -16,6 +16,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showRegisterConfirm, setShowRegisterConfirm] = useState(false);
+  const passwordHint = 'Минимум 8 символов, буквы в разных регистрах, цифра и спецсимвол.';
 
   useEffect(() => {
     setMode(initialMode);
@@ -44,6 +45,10 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
     event.preventDefault();
     if (!validateFIO(registerForm.name)) {
       alert('Введите корректное ФИО на русском (Например: Иванов Иван)');
+      return;
+    }
+    if (!validatePassword(registerForm.password)) {
+      alert('Пароль слишком простой. Используйте буквы в разных регистрах, цифру и спецсимвол.');
       return;
     }
     if (registerForm.password !== registerForm.confirm) {
@@ -163,7 +168,9 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
               id="reg-password"
               placeholder="Пароль"
               required
-              minLength="4"
+              minLength="8"
+              pattern={passwordPattern}
+              title={passwordHint}
               value={registerForm.password}
               onChange={(event) =>
                 setRegisterForm((prev) => ({ ...prev, password: event.target.value }))
@@ -180,7 +187,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
               id="reg-password-confirm"
               placeholder="Подтвердите пароль"
               required
-              minLength="4"
+              minLength="8"
               value={registerForm.confirm}
               onChange={(event) =>
                 setRegisterForm((prev) => ({ ...prev, confirm: event.target.value }))

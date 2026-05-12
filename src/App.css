@@ -116,6 +116,21 @@ th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform
 .event-alarm { border-color: var(--danger); background: #fffcfc; }
 .event-resolved { border-color: var(--success); opacity: 0.8; }
 
+.loading-state { display: flex; align-items: center; gap: 12px; }
+.spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--primary); animation: spin 0.9s linear infinite; }
+
+.home-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.home-card h3 { display: flex; align-items: center; gap: 10px; }
+.home-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 15px 0; }
+.home-metric { background: #f7f8fa; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.metric-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+.metric-value { font-size: 18px; font-weight: 700; color: var(--dark); }
+.metric-alert { color: var(--danger); }
+.home-list { display: grid; gap: 12px; }
+.home-list-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.home-list-item:last-child { border-bottom: none; padding-bottom: 0; }
+.home-list-item small { display: block; }
+
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
 .modal-content { width: 100%; max-width: 400px; animation: scaleIn 0.3s ease; }
 .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -127,6 +142,7 @@ th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform
     70% { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
     100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
 }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -152,4 +168,6 @@ th { color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform
     .grid-form { grid-template-columns: 1fr; }
     .card { padding: 15px; }
     .form-box { padding: 25px 20px; }
+    .home-grid { grid-template-columns: 1fr; }
+    .home-metrics { grid-template-columns: 1fr; }
 }
