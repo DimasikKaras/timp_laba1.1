@@ -22,7 +22,7 @@ const DashboardLayout = ({
   const location = useLocation();
   const navigate = useNavigate();
   const isObjectsRoute = useMemo(() => {
-    return location.pathname === '/' || location.pathname.startsWith('/objects');
+    return location.pathname.startsWith('/objects');
   }, [location.pathname]);
 
   return (
