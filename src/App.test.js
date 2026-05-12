@@ -1,8 +1,17 @@
 import { render, screen } from '@testing-library/react';
+import axios from 'axios';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('axios');
+
+test('renders dispatcher home page', async () => {
+  axios.create.mockReturnValue(axios);
+  axios.get.mockResolvedValue({ data: [] });
+
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(await screen.findByText('Система диспетчерской ПБ')).toBeInTheDocument();
+  expect(screen.getByText('Объекты')).toBeInTheDocument();
+  expect(screen.getByText('Персонал')).toBeInTheDocument();
+  expect(screen.getByText('События')).toBeInTheDocument();
 });
