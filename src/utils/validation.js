@@ -8,4 +8,4 @@ const phoneRegex = /^(\+7|8)[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-
 
 export const validateFIO = (name) => fioRegex.test(name.trim());
 export const validatePhone = (phone) => phoneRegex.test(phone.trim());
-export const validatePassword = (password) => passwordRegex.test(password.trim());
+export const validatePassword = (password) => passwordRegex.test(password);

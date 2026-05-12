@@ -48,7 +48,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
       return;
     }
     if (!validatePassword(registerForm.password)) {
-      alert('Пароль слишком простой. Минимум 8 символов без пробелов, буквы в разных регистрах, цифра и спецсимвол.');
+      alert(`Пароль слишком простой. ${passwordHint}`);
       return;
     }
     if (registerForm.password !== registerForm.confirm) {
