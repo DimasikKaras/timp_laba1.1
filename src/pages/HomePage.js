@@ -22,9 +22,14 @@ const HomePage = ({ objects, personnel, events }) => {
   const resolvedEvents = events.length - activeEvents;
   const latestObjects = useMemo(() => objects.slice(0, MAX_DASHBOARD_ITEMS), [objects]);
   const latestPersonnel = useMemo(() => personnel.slice(0, MAX_DASHBOARD_ITEMS), [personnel]);
-  const latestEvents = useMemo(() => {
-    return [...events].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, MAX_DASHBOARD_ITEMS);
-  }, [events]);
+  const sortedEvents = useMemo(
+    () => [...events].sort((a, b) => (b.id || 0) - (a.id || 0)),
+    [events]
+  );
+  const latestEvents = useMemo(
+    () => sortedEvents.slice(0, MAX_DASHBOARD_ITEMS),
+    [sortedEvents]
+  );
 
   return (
     <section id="home-tab" className="tab-content">

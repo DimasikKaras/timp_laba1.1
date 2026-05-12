@@ -9,7 +9,7 @@ const EventsPage = ({ events, setEvents, objects, setObjects, personnel, setPers
       setEvents((prev) => prev.filter((item) => item.id !== eventId));
     } catch (error) {
       console.error(`Ошибка удаления события с ID ${eventId}:`, error);
-      alert('Не удалось удалить событие.');
+      alert('Не удалось удалить событие. Попробуйте позже.');
     }
   };
 
