@@ -16,7 +16,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showRegisterConfirm, setShowRegisterConfirm] = useState(false);
-  const passwordHint = 'Минимум 8 символов, буквы в разных регистрах, цифра и спецсимвол.';
+  const passwordHint = 'Минимум 8 символов без пробелов, буквы в разных регистрах, цифра и спецсимвол.';
 
   useEffect(() => {
     setMode(initialMode);
@@ -48,7 +48,7 @@ const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
       return;
     }
     if (!validatePassword(registerForm.password)) {
-      alert('Пароль слишком простой. Используйте буквы в разных регистрах, цифру и спецсимвол.');
+      alert('Пароль слишком простой. Минимум 8 символов без пробелов, буквы в разных регистрах, цифра и спецсимвол.');
       return;
     }
     if (registerForm.password !== registerForm.confirm) {

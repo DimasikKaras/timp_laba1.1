@@ -1,7 +1,7 @@
 export const fioPattern =
   '^([А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?|[А-Яа-яЁё]+\\s+[А-Яа-яЁё]\\.?(\\s*[А-Яа-яЁё]\\.?)?)$';
 export const passwordPattern =
-  '^(?=.*[a-zа-яё])(?=.*[A-ZА-ЯЁ])(?=.*\\d)(?=.*[^A-Za-zА-Яа-яЁё0-9\\s]).{8,}$';
+  '^(?=.*[a-zа-яё])(?=.*[A-ZА-ЯЁ])(?=.*\\d)(?=.*[^A-Za-zА-Яа-яЁё0-9\\s])(?!.*\\s).{8,}$';
 const fioRegex = new RegExp(fioPattern);
 const passwordRegex = new RegExp(passwordPattern);
 const phoneRegex = /^(\+7|8)[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
