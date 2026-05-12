@@ -1,32 +1,37 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useMatch, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { validateFIO, validatePhone } from '../utils/validation';
+import { fioPattern, validateFIO, validatePhone } from '../utils/validation';
 
 const ObjectsPage = ({ objects, setObjects, setEvents }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const detailsMatch = useMatch('/objects/detail/:id');
+  const editMatch = useMatch('/objects/rename/:id');
+  const createMatch = useMatch('/objects/create');
   const [formData, setFormData] = useState({
     name: '',
     address: '',
     contactName: '',
     contactPhone: '',
   });
-  const [detailsObjectId, setDetailsObjectId] = useState(null);
   const [editObject, setEditObject] = useState(null);
-
-  useEffect(() => {
-    if (id) {
-      setDetailsObjectId(id);
-    } else {
-      setDetailsObjectId(null);
-    }
-  }, [id]);
+  const detailsObjectId = detailsMatch?.params?.id || null;
+  const editObjectId = editMatch?.params?.id || null;
+  const isCreateMode = Boolean(createMatch);
 
   const detailsObject = useMemo(() => {
     if (!detailsObjectId) return null;
     return objects.find((obj) => String(obj.id) === String(detailsObjectId));
   }, [detailsObjectId, objects]);
+
+  useEffect(() => {
+    if (!editObjectId) {
+      setEditObject(null);
+      return;
+    }
+    const target = objects.find((obj) => String(obj.id) === String(editObjectId));
+    setEditObject(target ? { ...target } : null);
+  }, [editObjectId, objects]);
 
   const handleAddObject = async (event) => {
     event.preventDefault();
@@ -50,6 +55,7 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
       const response = await api.post('/objects', newObj);
       setObjects((prev) => [...prev, response.data]);
       setFormData({ name: '', address: '', contactName: '', contactPhone: '' });
+      navigate('/objects');
     } catch (error) {
       console.error('Ошибка создания объекта', error);
       alert('Ошибка сети: объект не создан.');
@@ -102,10 +108,6 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
     }
   };
 
-  const openEditObjectModal = (obj) => {
-    setEditObject({ ...obj });
-  };
-
   const handleEditObject = async (event) => {
     event.preventDefault();
     if (!editObject) return;
@@ -122,7 +124,7 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
       setObjects((prev) =>
         prev.map((item) => (item.id === editObject.id ? response.data : item))
       );
-      setEditObject(null);
+      navigate('/objects');
     } catch (error) {
       console.error('Ошибка редактирования объекта', error);
       alert('Ошибка сети: изменения не сохранены.');
@@ -130,7 +132,7 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
   };
 
   const closeDetails = () => {
-    navigate('/');
+    navigate('/objects');
   };
 
   return (
@@ -139,47 +141,60 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
         <h1>Управление объектами</h1>
       </header>
       <div className="card add-form">
-        <h3><i className="fa-solid fa-plus"></i> Добавить объект</h3>
-        <form id="add-object-form" className="grid-form" onSubmit={handleAddObject}>
-          <input
-            type="text"
-            id="obj-name"
-            placeholder="Название (напр. ТЦ Галерея)"
-            required
-            value={formData.name}
-            onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-          />
-          <input
-            type="text"
-            id="obj-address"
-            placeholder="Адрес"
-            required
-            value={formData.address}
-            onChange={(event) => setFormData((prev) => ({ ...prev, address: event.target.value }))}
-          />
-          <input
-            type="text"
-            id="obj-contact-name"
-            placeholder="ФИО (Иванов И.И.)"
-            required
-            pattern="^[А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?$"
-            value={formData.contactName}
-            onChange={(event) =>
-              setFormData((prev) => ({ ...prev, contactName: event.target.value }))
-            }
-          />
-          <input
-            type="tel"
-            id="obj-contact-phone"
-            placeholder="Телефон (+7 999 000-00-00)"
-            required
-            value={formData.contactPhone}
-            onChange={(event) =>
-              setFormData((prev) => ({ ...prev, contactPhone: event.target.value }))
-            }
-          />
-          <button type="submit" className="btn btn-primary">Добавить</button>
-        </form>
+        <div className="section-header">
+          <h3><i className="fa-solid fa-plus"></i> Добавить объект</h3>
+          {!isCreateMode && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => navigate('/objects/create')}
+            >
+              Перейти к форме
+            </button>
+          )}
+        </div>
+        {isCreateMode && (
+          <form id="add-object-form" className="grid-form" onSubmit={handleAddObject}>
+            <input
+              type="text"
+              id="obj-name"
+              placeholder="Название (напр. ТЦ Галерея)"
+              required
+              value={formData.name}
+              onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
+            />
+            <input
+              type="text"
+              id="obj-address"
+              placeholder="Адрес"
+              required
+              value={formData.address}
+              onChange={(event) => setFormData((prev) => ({ ...prev, address: event.target.value }))}
+            />
+            <input
+              type="text"
+              id="obj-contact-name"
+              placeholder="ФИО (Иванов И.И.)"
+              required
+              pattern={fioPattern}
+              value={formData.contactName}
+              onChange={(event) =>
+                setFormData((prev) => ({ ...prev, contactName: event.target.value }))
+              }
+            />
+            <input
+              type="tel"
+              id="obj-contact-phone"
+              placeholder="Телефон (+7 999 000-00-00)"
+              required
+              value={formData.contactPhone}
+              onChange={(event) =>
+                setFormData((prev) => ({ ...prev, contactPhone: event.target.value }))
+              }
+            />
+            <button type="submit" className="btn btn-primary">Добавить</button>
+          </form>
+        )}
       </div>
 
       <div className="card table-container">
@@ -207,10 +222,16 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
                       <button className="btn btn-sm btn-danger" onClick={() => triggerAlarm(obj.id)}>
                         <i className="fa-solid fa-bell"></i>
                       </button>
-                      <button className="btn btn-sm btn-secondary" onClick={() => navigate(`/detail/${obj.id}`)}>
+                      <button
+                        className="btn btn-sm btn-secondary"
+                        onClick={() => navigate(`/objects/detail/${obj.id}`)}
+                      >
                         <i className="fa-solid fa-eye"></i>
                       </button>
-                      <button className="btn btn-sm btn-outline" onClick={() => openEditObjectModal(obj)}>
+                      <button
+                        className="btn btn-sm btn-outline"
+                        onClick={() => navigate(`/objects/rename/${obj.id}`)}
+                      >
                         <i className="fa-solid fa-pen"></i>
                       </button>
                       <button className="btn btn-sm btn-outline" onClick={() => deleteObject(obj.id)}>
@@ -252,57 +273,70 @@ const ObjectsPage = ({ objects, setObjects, setEvents }) => {
         </div>
       )}
 
-      {editObject && (
+      {editObjectId && (
         <div id="edit-object-modal" className="modal">
           <div className="modal-content card">
             <h3>Редактировать объект</h3>
-            <form id="edit-object-form" className="mt-15" onSubmit={handleEditObject}>
-              <input
-                type="text"
-                id="edit-obj-name"
-                className="w-100 mb-10"
-                placeholder="Название"
-                required
-                value={editObject.name}
-                onChange={(event) => setEditObject((prev) => ({ ...prev, name: event.target.value }))}
-              />
-              <input
-                type="text"
-                id="edit-obj-address"
-                className="w-100 mb-10"
-                placeholder="Адрес"
-                required
-                value={editObject.address}
-                onChange={(event) => setEditObject((prev) => ({ ...prev, address: event.target.value }))}
-              />
-              <input
-                type="text"
-                id="edit-obj-contact-name"
-                className="w-100 mb-10"
-                placeholder="ФИО ответственного"
-                required
-                pattern="^[А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?$"
-                value={editObject.contactName}
-                onChange={(event) =>
-                  setEditObject((prev) => ({ ...prev, contactName: event.target.value }))
-                }
-              />
-              <input
-                type="tel"
-                id="edit-obj-contact-phone"
-                className="w-100 mb-10"
-                placeholder="Телефон"
-                required
-                value={editObject.contactPhone}
-                onChange={(event) =>
-                  setEditObject((prev) => ({ ...prev, contactPhone: event.target.value }))
-                }
-              />
-              <div className="modal-actions mt-15">
-                <button type="submit" className="btn btn-primary w-100">Сохранить</button>
-                <button type="button" onClick={() => setEditObject(null)} className="btn btn-outline w-100">Отмена</button>
-              </div>
-            </form>
+            {editObject ? (
+              <form id="edit-object-form" className="mt-15" onSubmit={handleEditObject}>
+                <input
+                  type="text"
+                  id="edit-obj-name"
+                  className="w-100 mb-10"
+                  placeholder="Название"
+                  required
+                  value={editObject.name}
+                  onChange={(event) => setEditObject((prev) => ({ ...prev, name: event.target.value }))}
+                />
+                <input
+                  type="text"
+                  id="edit-obj-address"
+                  className="w-100 mb-10"
+                  placeholder="Адрес"
+                  required
+                  value={editObject.address}
+                  onChange={(event) => setEditObject((prev) => ({ ...prev, address: event.target.value }))}
+                />
+                <input
+                  type="text"
+                  id="edit-obj-contact-name"
+                  className="w-100 mb-10"
+                  placeholder="ФИО ответственного"
+                  required
+                  pattern={fioPattern}
+                  value={editObject.contactName}
+                  onChange={(event) =>
+                    setEditObject((prev) => ({ ...prev, contactName: event.target.value }))
+                  }
+                />
+                <input
+                  type="tel"
+                  id="edit-obj-contact-phone"
+                  className="w-100 mb-10"
+                  placeholder="Телефон"
+                  required
+                  value={editObject.contactPhone}
+                  onChange={(event) =>
+                    setEditObject((prev) => ({ ...prev, contactPhone: event.target.value }))
+                  }
+                />
+                <div className="modal-actions mt-15">
+                  <button type="submit" className="btn btn-primary w-100">Сохранить</button>
+                  <button type="button" onClick={() => navigate('/objects')} className="btn btn-outline w-100">Отмена</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <p className="text-muted">Объект не найден.</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/objects')}
+                  className="btn btn-outline w-100 mt-15"
+                >
+                  Назад
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

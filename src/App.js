@@ -22,9 +22,7 @@ const DashboardLayout = ({
   const location = useLocation();
   const navigate = useNavigate();
   const isObjectsRoute = useMemo(() => {
-    return location.pathname === '/' ||
-      location.pathname.startsWith('/detail') ||
-      location.pathname.startsWith('/add');
+    return location.pathname.startsWith('/objects');
   }, [location.pathname]);
 
   return (
@@ -40,7 +38,7 @@ const DashboardLayout = ({
           </button>
         </div>
         <nav className="sidebar-nav">
-          <button className={`nav-btn ${isObjectsRoute ? 'active' : ''}`} onClick={() => navigate('/')}>
+          <button className={`nav-btn ${isObjectsRoute ? 'active' : ''}`} onClick={() => navigate('/objects')}>
             <i className="fa-solid fa-building"></i> <span>Объекты</span>
           </button>
           <button className={`nav-btn ${location.pathname.startsWith('/personnel') ? 'active' : ''}`} onClick={() => navigate('/personnel')}>
@@ -73,18 +71,34 @@ const DashboardLayout = ({
         <Routes>
           <Route
             path="/"
+            element={<Navigate to="/objects" replace />}
+          />
+          <Route
+            path="/objects"
             element={<ObjectsPage objects={objects} setObjects={setObjects} setEvents={setEvents} />}
           />
           <Route
-            path="/add"
+            path="/objects/create"
             element={<ObjectsPage objects={objects} setObjects={setObjects} setEvents={setEvents} />}
           />
           <Route
-            path="/detail/:id"
+            path="/objects/detail/:id"
+            element={<ObjectsPage objects={objects} setObjects={setObjects} setEvents={setEvents} />}
+          />
+          <Route
+            path="/objects/rename/:id"
             element={<ObjectsPage objects={objects} setObjects={setObjects} setEvents={setEvents} />}
           />
           <Route
             path="/personnel"
+            element={<PersonnelPage personnel={personnel} setPersonnel={setPersonnel} objects={objects} />}
+          />
+          <Route
+            path="/personnel/create"
+            element={<PersonnelPage personnel={personnel} setPersonnel={setPersonnel} objects={objects} />}
+          />
+          <Route
+            path="/personnel/rename/:id"
             element={<PersonnelPage personnel={personnel} setPersonnel={setPersonnel} objects={objects} />}
           />
           <Route
@@ -100,7 +114,10 @@ const DashboardLayout = ({
               />
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/authentication" element={<Navigate to="/objects" replace />} />
+          <Route path="/Authentication" element={<Navigate to="/authentication" replace />} />
+          <Route path="/register" element={<Navigate to="/objects" replace />} />
+          <Route path="*" element={<Navigate to="/objects" replace />} />
         </Routes>
       </main>
     </div>
@@ -178,7 +195,16 @@ const App = () => {
         />
       ) : (
         <Routes>
-          <Route path="*" element={<AuthPage onAuthenticated={setCurrentUser} />} />
+          <Route
+            path="/authentication"
+            element={<AuthPage onAuthenticated={setCurrentUser} initialMode="login" />}
+          />
+          <Route path="/Authentication" element={<Navigate to="/authentication" replace />} />
+          <Route
+            path="/register"
+            element={<AuthPage onAuthenticated={setCurrentUser} initialMode="register" />}
+          />
+          <Route path="*" element={<Navigate to="/authentication" replace />} />
         </Routes>
       )}
     </BrowserRouter>

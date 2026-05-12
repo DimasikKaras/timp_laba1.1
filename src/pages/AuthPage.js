@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import { validateFIO } from '../utils/validation';
+import { fioPattern, validateFIO } from '../utils/validation';
 
-const AuthPage = ({ onAuthenticated }) => {
-  const [mode, setMode] = useState('login');
+const AuthPage = ({ onAuthenticated, initialMode = 'login' }) => {
+  const [mode, setMode] = useState(initialMode);
+  const navigate = useNavigate();
   const [loginForm, setLoginForm] = useState({ login: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
     name: '',
@@ -14,6 +16,10 @@ const AuthPage = ({ onAuthenticated }) => {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showRegisterConfirm, setShowRegisterConfirm] = useState(false);
+
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
@@ -109,7 +115,10 @@ const AuthPage = ({ onAuthenticated }) => {
           <button
             type="button"
             className="link-button"
-            onClick={() => setMode('register')}
+            onClick={() => {
+              setMode('register');
+              navigate('/register');
+            }}
           >
             Зарегистрироваться
           </button>
@@ -129,7 +138,7 @@ const AuthPage = ({ onAuthenticated }) => {
               placeholder="ФИО (Например: Иванов Иван)"
               required
               title="Введите Фамилию и Имя на русском языке"
-              pattern="^[А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?$"
+              pattern={fioPattern}
               value={registerForm.name}
               onChange={(event) =>
                 setRegisterForm((prev) => ({ ...prev, name: event.target.value }))
@@ -189,7 +198,10 @@ const AuthPage = ({ onAuthenticated }) => {
           <button
             type="button"
             className="link-button"
-            onClick={() => setMode('login')}
+            onClick={() => {
+              setMode('login');
+              navigate('/authentication');
+            }}
           >
             Войти
           </button>

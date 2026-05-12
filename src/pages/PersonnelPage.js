@@ -1,8 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useMatch, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { validateFIO, validatePhone } from '../utils/validation';
+import { fioPattern, validateFIO, validatePhone } from '../utils/validation';
 
 const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
+  const navigate = useNavigate();
+  const editMatch = useMatch('/personnel/rename/:id');
+  const createMatch = useMatch('/personnel/create');
   const [formData, setFormData] = useState({
     name: '',
     position: '',
@@ -11,11 +15,22 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
   const [assignPersonId, setAssignPersonId] = useState(null);
   const [assignTargetId, setAssignTargetId] = useState('none');
   const [editPerson, setEditPerson] = useState(null);
+  const editPersonId = editMatch?.params?.id || null;
+  const isCreateMode = Boolean(createMatch);
 
   const assignPerson = useMemo(
     () => personnel.find((person) => person.id === assignPersonId),
     [assignPersonId, personnel]
   );
+
+  useEffect(() => {
+    if (!editPersonId) {
+      setEditPerson(null);
+      return;
+    }
+    const target = personnel.find((person) => String(person.id) === String(editPersonId));
+    setEditPerson(target ? { ...target } : null);
+  }, [editPersonId, personnel]);
 
   const handleAddPersonnel = async (event) => {
     event.preventDefault();
@@ -39,6 +54,7 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
       const response = await api.post('/personnel', newPerson);
       setPersonnel((prev) => [...prev, response.data]);
       setFormData({ name: '', position: '', phone: '' });
+      navigate('/personnel');
     } catch (error) {
       console.error('Ошибка добавления сотрудника', error);
       alert('Ошибка сети: сотрудник не создан.');
@@ -98,7 +114,7 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
       setPersonnel((prev) =>
         prev.map((person) => (person.id === editPerson.id ? response.data : person))
       );
-      setEditPerson(null);
+      navigate('/personnel');
     } catch (error) {
       console.error('Ошибка редактирования сотрудника', error);
       alert('Ошибка сети: изменения не сохранены.');
@@ -119,39 +135,52 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
         <h1>Управление персоналом</h1>
       </header>
       <div className="card add-form">
-        <h3><i className="fa-solid fa-user-plus"></i> Добавить сотрудника</h3>
-        <form id="add-personnel-form" className="grid-form" onSubmit={handleAddPersonnel}>
-          <input
-            type="text"
-            id="pers-name"
-            placeholder="ФИО (Иванов Иван)"
-            required
-            pattern="^[А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?$"
-            value={formData.name}
-            onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-          />
-          <select
-            id="pers-position"
-            required
-            value={formData.position}
-            onChange={(event) => setFormData((prev) => ({ ...prev, position: event.target.value }))}
-          >
-            <option value="">Должность...</option>
-            <option value="Пожарный">Пожарный</option>
-            <option value="Инспектор">Инспектор</option>
-            <option value="Водитель">Водитель</option>
-            <option value="Медик">Медик</option>
-          </select>
-          <input
-            type="tel"
-            id="pers-phone"
-            placeholder="Телефон (+7 999 000-00-00)"
-            required
-            value={formData.phone}
-            onChange={(event) => setFormData((prev) => ({ ...prev, phone: event.target.value }))}
-          />
-          <button type="submit" className="btn btn-primary">Добавить</button>
-        </form>
+        <div className="section-header">
+          <h3><i className="fa-solid fa-user-plus"></i> Добавить сотрудника</h3>
+          {!isCreateMode && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => navigate('/personnel/create')}
+            >
+              Перейти к форме
+            </button>
+          )}
+        </div>
+        {isCreateMode && (
+          <form id="add-personnel-form" className="grid-form" onSubmit={handleAddPersonnel}>
+            <input
+              type="text"
+              id="pers-name"
+              placeholder="ФИО (Иванов Иван)"
+              required
+              pattern={fioPattern}
+              value={formData.name}
+              onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
+            />
+            <select
+              id="pers-position"
+              required
+              value={formData.position}
+              onChange={(event) => setFormData((prev) => ({ ...prev, position: event.target.value }))}
+            >
+              <option value="">Должность...</option>
+              <option value="Пожарный">Пожарный</option>
+              <option value="Инспектор">Инспектор</option>
+              <option value="Водитель">Водитель</option>
+              <option value="Медик">Медик</option>
+            </select>
+            <input
+              type="tel"
+              id="pers-phone"
+              placeholder="Телефон (+7 999 000-00-00)"
+              required
+              value={formData.phone}
+              onChange={(event) => setFormData((prev) => ({ ...prev, phone: event.target.value }))}
+            />
+            <button type="submit" className="btn btn-primary">Добавить</button>
+          </form>
+        )}
       </div>
 
       <div className="card table-container">
@@ -180,7 +209,10 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
                       <button className="btn btn-sm btn-secondary" onClick={() => openAssignModal(person.id)}>
                         <i className="fa-solid fa-location-dot"></i> Назначить
                       </button>
-                      <button className="btn btn-sm btn-outline" onClick={() => setEditPerson({ ...person })}>
+                      <button
+                        className="btn btn-sm btn-outline"
+                        onClick={() => navigate(`/personnel/rename/${person.id}`)}
+                      >
                         <i className="fa-solid fa-pen"></i>
                       </button>
                       <button className="btn btn-sm btn-outline" onClick={() => deletePerson(person.id)}>
@@ -220,47 +252,66 @@ const PersonnelPage = ({ personnel, setPersonnel, objects }) => {
         </div>
       )}
 
-      {editPerson && (
+      {editPersonId && (
         <div id="edit-personnel-modal" className="modal">
           <div className="modal-content card">
             <h3>Редактировать сотрудника</h3>
-            <form id="edit-personnel-form" className="mt-15" onSubmit={handleEditPerson}>
-              <input
-                type="text"
-                id="edit-pers-name"
-                className="w-100 mb-10"
-                placeholder="ФИО"
-                required
-                pattern="^[А-Яа-яЁё]+\\s+[А-Яа-яЁё]+(\\s+[А-Яа-яЁё]+)?$"
-                value={editPerson.name}
-                onChange={(event) => setEditPerson((prev) => ({ ...prev, name: event.target.value }))}
-              />
-              <select
-                id="edit-pers-position"
-                className="w-100 mb-10"
-                required
-                value={editPerson.position}
-                onChange={(event) => setEditPerson((prev) => ({ ...prev, position: event.target.value }))}
-              >
-                <option value="Пожарный">Пожарный</option>
-                <option value="Инспектор">Инспектор</option>
-                <option value="Водитель">Водитель</option>
-                <option value="Медик">Медик</option>
-              </select>
-              <input
-                type="tel"
-                id="edit-pers-phone"
-                className="w-100 mb-10"
-                placeholder="Телефон"
-                required
-                value={editPerson.phone}
-                onChange={(event) => setEditPerson((prev) => ({ ...prev, phone: event.target.value }))}
-              />
-              <div className="modal-actions mt-15">
-                <button type="submit" className="btn btn-primary w-100">Сохранить</button>
-                <button type="button" onClick={() => setEditPerson(null)} className="btn btn-outline w-100">Отмена</button>
-              </div>
-            </form>
+            {editPerson ? (
+              <form id="edit-personnel-form" className="mt-15" onSubmit={handleEditPerson}>
+                <input
+                  type="text"
+                  id="edit-pers-name"
+                  className="w-100 mb-10"
+                  placeholder="ФИО"
+                  required
+                  pattern={fioPattern}
+                  value={editPerson.name}
+                  onChange={(event) => setEditPerson((prev) => ({ ...prev, name: event.target.value }))}
+                />
+                <select
+                  id="edit-pers-position"
+                  className="w-100 mb-10"
+                  required
+                  value={editPerson.position}
+                  onChange={(event) => setEditPerson((prev) => ({ ...prev, position: event.target.value }))}
+                >
+                  <option value="Пожарный">Пожарный</option>
+                  <option value="Инспектор">Инспектор</option>
+                  <option value="Водитель">Водитель</option>
+                  <option value="Медик">Медик</option>
+                </select>
+                <input
+                  type="tel"
+                  id="edit-pers-phone"
+                  className="w-100 mb-10"
+                  placeholder="Телефон"
+                  required
+                  value={editPerson.phone}
+                  onChange={(event) => setEditPerson((prev) => ({ ...prev, phone: event.target.value }))}
+                />
+                <div className="modal-actions mt-15">
+                  <button type="submit" className="btn btn-primary w-100">Сохранить</button>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/personnel')}
+                    className="btn btn-outline w-100"
+                  >
+                    Отмена
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <p className="text-muted">Сотрудник не найден.</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/personnel')}
+                  className="btn btn-outline w-100 mt-15"
+                >
+                  Назад
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
