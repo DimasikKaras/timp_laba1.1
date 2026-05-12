@@ -2,6 +2,17 @@ import React from 'react';
 import api from '../api';
 
 const EventsPage = ({ events, setEvents, objects, setObjects, personnel, setPersonnel }) => {
+  const deleteEvent = async (eventId) => {
+    if (!window.confirm('Удалить событие?')) return;
+    try {
+      await api.delete(`/events/${eventId}`);
+      setEvents((prev) => prev.filter((item) => item.id !== eventId));
+    } catch (error) {
+      console.error(`Ошибка удаления события с ID ${eventId}:`, error);
+      alert('Не удалось удалить событие. Попробуйте позже.');
+    }
+  };
+
   const resolveEvent = async (eventId, objectId) => {
     const eventItem = events.find((item) => item.id === eventId);
     if (!eventItem) return;
@@ -71,14 +82,30 @@ const EventsPage = ({ events, setEvents, objects, setObjects, personnel, setPers
               </div>
               <div className="event-actions">
                 {eventItem.status === 'alarm' ? (
-                  <button
-                    className="btn btn-success"
-                    onClick={() => resolveEvent(eventItem.id, eventItem.objectId)}
-                  >
-                    <i className="fa-solid fa-check"></i> Урегулировано
-                  </button>
+                  <>
+                    <button
+                      className="btn btn-success"
+                      onClick={() => resolveEvent(eventItem.id, eventItem.objectId)}
+                    >
+                      <i className="fa-solid fa-check"></i> Урегулировано
+                    </button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => deleteEvent(eventItem.id)}
+                    >
+                      <i className="fa-solid fa-trash"></i> Удалить
+                    </button>
+                  </>
                 ) : (
-                  <span className="badge badge-ok"><i className="fa-solid fa-shield-check"></i> Безопасно</span>
+                  <>
+                    <span className="badge badge-ok"><i className="fa-solid fa-shield-check"></i> Безопасно</span>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => deleteEvent(eventItem.id)}
+                    >
+                      <i className="fa-solid fa-trash"></i> Удалить
+                    </button>
+                  </>
                 )}
               </div>
             </div>
