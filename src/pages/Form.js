@@ -35,7 +35,7 @@ const Form = () => {
         }
         setFormData(nextData);
       } catch (err) {
-        setError('Не удалось загрузить запись для редактирования.');
+        setError(`Не удалось загрузить запись для редактирования. ${err.message}`);
       }
     };
 
@@ -59,7 +59,7 @@ const Form = () => {
       }
       navigate('/');
     } catch (err) {
-      setError('Не удалось сохранить данные.');
+      setError(`Не удалось сохранить данные. ${err.message}`);
     }
   };
 

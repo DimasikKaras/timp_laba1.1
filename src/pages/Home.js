@@ -19,7 +19,7 @@ const Home = () => {
       }, {});
       setData(nextData);
     } catch (err) {
-      setError('Не удалось загрузить данные. Проверьте json-server.');
+      setError(`Не удалось загрузить данные. ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -37,7 +37,7 @@ const Home = () => {
         [type]: prev[type].filter((item) => item.id !== id),
       }));
     } catch (err) {
-      setError('Не удалось удалить запись.');
+      setError(`Не удалось удалить запись. ${err.message}`);
     }
   };
 

@@ -17,7 +17,7 @@ const Detail = () => {
         const response = await api.get(`/${type}/${id}`);
         setItem(response.data);
       } catch (err) {
-        setError('Запись не найдена.');
+        setError(`Ошибка загрузки записи. ${err.message}`);
       }
     };
 
