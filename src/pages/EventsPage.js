@@ -8,7 +8,7 @@ const EventsPage = ({ events, setEvents, objects, setObjects, personnel, setPers
       await api.delete(`/events/${eventId}`);
       setEvents((prev) => prev.filter((item) => item.id !== eventId));
     } catch (error) {
-      console.error('Ошибка удаления события', eventId, error);
+      console.error(`Ошибка удаления события с ID ${eventId}:`, error);
       alert('Не удалось удалить событие.');
     }
   };

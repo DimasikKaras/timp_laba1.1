@@ -20,14 +20,11 @@ const HomePage = ({ objects, personnel, events }) => {
     [events]
   );
   const resolvedEvents = events.length - activeEvents;
-  const latestObjects = useMemo(() => objects.slice(0, MAX_DASHBOARD_ITEMS), [objects, MAX_DASHBOARD_ITEMS]);
-  const latestPersonnel = useMemo(
-    () => personnel.slice(0, MAX_DASHBOARD_ITEMS),
-    [personnel, MAX_DASHBOARD_ITEMS]
-  );
+  const latestObjects = useMemo(() => objects.slice(0, MAX_DASHBOARD_ITEMS), [objects]);
+  const latestPersonnel = useMemo(() => personnel.slice(0, MAX_DASHBOARD_ITEMS), [personnel]);
   const latestEvents = useMemo(() => {
     return [...events].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, MAX_DASHBOARD_ITEMS);
-  }, [events, MAX_DASHBOARD_ITEMS]);
+  }, [events]);
 
   return (
     <section id="home-tab" className="tab-content">
