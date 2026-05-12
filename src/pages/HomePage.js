@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HomePage = ({ objects, personnel, events }) => {
   const navigate = useNavigate();
+  const MAX_DASHBOARD_ITEMS = 3;
   const totalObjects = objects.length;
   const alarmObjects = useMemo(
     () => objects.filter((obj) => obj.status === 'Тревога').length,
@@ -19,11 +20,14 @@ const HomePage = ({ objects, personnel, events }) => {
     [events]
   );
   const resolvedEvents = events.length - activeEvents;
-  const latestObjects = useMemo(() => objects.slice(0, 3), [objects]);
-  const latestPersonnel = useMemo(() => personnel.slice(0, 3), [personnel]);
+  const latestObjects = useMemo(() => objects.slice(0, MAX_DASHBOARD_ITEMS), [objects, MAX_DASHBOARD_ITEMS]);
+  const latestPersonnel = useMemo(
+    () => personnel.slice(0, MAX_DASHBOARD_ITEMS),
+    [personnel, MAX_DASHBOARD_ITEMS]
+  );
   const latestEvents = useMemo(() => {
-    return [...events].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 3);
-  }, [events]);
+    return [...events].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, MAX_DASHBOARD_ITEMS);
+  }, [events, MAX_DASHBOARD_ITEMS]);
 
   return (
     <section id="home-tab" className="tab-content">
