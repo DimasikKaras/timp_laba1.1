@@ -2,13 +2,17 @@ import axios from 'axios';
 
 const resolveDefaultApiUrl = () => {
   if (typeof window === 'undefined') {
-    throw new Error('REACT_APP_API_URL must be set when window is unavailable.');
+    throw new Error(
+      'REACT_APP_API_URL must be set in server-side contexts where window is unavailable.'
+    );
   }
 
   const { protocol, hostname } = window.location;
 
   if (protocol !== 'http:' && protocol !== 'https:') {
-    return '';
+    throw new Error(
+      `Unsupported protocol "${protocol}" for API requests. Set REACT_APP_API_URL explicitly.`
+    );
   }
 
   return `${protocol}//${hostname}:5000`;
