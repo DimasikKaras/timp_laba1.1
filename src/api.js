@@ -3,7 +3,7 @@ import axios from 'axios';
 const resolveDefaultApiUrl = () => {
   if (typeof window === 'undefined') {
     throw new Error(
-      'REACT_APP_API_URL must be set in server-side contexts where window is unavailable.'
+      'Environment variable REACT_APP_API_URL must be set in server-side contexts where window is unavailable.'
     );
   }
 

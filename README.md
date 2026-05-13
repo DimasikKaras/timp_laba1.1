@@ -9,8 +9,8 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://<server-host>:3000](http://<server-host>:3000) to view it in your browser.
-Replace `<server-host>` with your server hostname or IP address.
+Open [http://your-server-host:3000](http://your-server-host:3000) to view it in your browser.
+Replace `your-server-host` with your server hostname or IP address.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
@@ -71,5 +71,5 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 ### `npm run api`
 
-Запускает json-server на [http://<server-host>:5000](http://<server-host>:5000) и поднимает REST API для сущностей (users, objects, personnel, events).
-Замените `<server-host>` на адрес сервера (домен или IP).
+Запускает json-server на [http://your-server-host:5000](http://your-server-host:5000) и поднимает REST API для сущностей (users, objects, personnel, events).
+Замените `your-server-host` на адрес сервера (домен или IP).
